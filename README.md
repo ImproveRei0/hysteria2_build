@@ -30,8 +30,7 @@
 要使用这个脚本，请将以下命令粘贴到你的终端中并按提示操作：
 
 ```bash
-#!/bin/bash
-#... 脚本内容在这里 ...
+bash <(curl -fsSL https://raw.githubusercontent.com/ImproveRei0/hysteria2_build/main/build.sh)https://raw.githubusercontent.com/ImproveRei0/hysteria2_build/main/build.sh)
 ```
 
 请注意，这个脚本是为熟悉终端操作和网络协议的高级用户设计的。
