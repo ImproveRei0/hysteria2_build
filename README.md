@@ -40,6 +40,11 @@
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/ImproveRei0/hysteria2_build/main/build.sh)
 ```
+或者使用下面英文版本以解决部分ssh链接中文乱码问题
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/ImproveRei0/hysteria2_build/main/build_en.sh)
+```
 
 请注意，这个脚本是为熟悉终端操作和网络协议的高级用户设计的。
 
