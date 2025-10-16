@@ -86,15 +86,19 @@ detect_os_and_init() {
 
 # 安装依赖
 install_dependencies() {
-    info "正在更新软件包列表并安装依赖 (curl, sudo, openssl)..."
+    info "正在更新软件包列表并安装依赖..."
     case "$PKG_MANAGER" in
         apt-get)
             apt-get update -y
             apt-get install -y curl sudo openssl || error "依赖安装失败。"
             ;;
         apk)
+            # Alpine 需要额外的包来兼容官方脚本
+            # grep: 提供完整的 GNU grep，因为 busybox grep 不支持 -P 选项
+            # shadow: 提供 useradd 命令
+            info "为 Alpine 安装额外兼容性依赖 (grep, shadow)..."
             apk update
-            apk add curl sudo openssl || error "依赖安装失败。"
+            apk add curl sudo openssl grep shadow || error "依赖安装失败。"
             ;;
     esac
     success "依赖安装完成。"
@@ -103,7 +107,13 @@ install_dependencies() {
 # 安装 Hysteria
 install_hysteria() {
     info "正在从官方源安装 Hysteria..."
-    bash <(curl -fsSL https://get.hy2.sh/) || error "Hysteria 安装脚本执行失败。"
+    if [ "$OS_ID" = "alpine" ]; then
+        info "在 Alpine 上运行，使用 FORCE_NO_SYSTEMD=2 标志..."
+        env FORCE_NO_SYSTEMD=2 bash <(curl -fsSL https://get.hy2.sh/) || error "Hysteria 安装脚本执行失败。"
+    else
+        bash <(curl -fsSL https://get.hy2.sh/) || error "Hysteria 安装脚本执行失败。"
+    fi
+
     if [ ! -f /usr/local/bin/hysteria ]; then
         error "Hysteria 可执行文件未找到，安装可能已失败。"
     fi
@@ -149,7 +159,8 @@ configure_hysteria() {
     # 获取密码
     read -p "是否自定义密码? (y/N): " useCustomPwd
     if [[ "$useCustomPwd" == "y" || "$useCustomPwd" == "Y" ]]; then
-        read -p "请输入您的自定义密码: " password
+        read -s -p "请输入您的自定义密码: " password
+        echo
         if [ -z "$password" ]; then
             error "密码不能为空。"
         fi
